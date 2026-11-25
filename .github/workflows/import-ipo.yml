@@ -6,6 +6,9 @@ on:
   schedule:
     - cron: "0 */6 * * *"
 
+permissions:
+  contents: read
+
 jobs:
   import-ipos:
     runs-on: ubuntu-latest
@@ -14,5 +17,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Show workflow status
-        run: echo "Xflot IPO importer workflow started successfully"
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Import IPO data into Firebase
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: python importer.py
